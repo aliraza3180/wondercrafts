@@ -8,7 +8,7 @@ type Props = {
 const BlankCard = ({ children, className }: Props) => {
   return (
     <Card
-      sx={{ p: 0, position: "relative" }}
+      sx={{ p: 2, position: "relative", borderRadius: 3 }}
       className={className}
       elevation={9}
       variant={undefined}

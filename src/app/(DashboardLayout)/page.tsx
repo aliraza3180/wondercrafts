@@ -18,6 +18,7 @@ const Dashboard = () => {
             <SalesOverview />
           </Grid>
           <Grid item xs={12}>
+            <h3>Added CheckIns</h3>
             <Blog />
           </Grid>
         </Grid>

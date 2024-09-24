@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import {
   CardContent,
@@ -7,12 +6,12 @@ import {
   Rating,
   Tooltip,
   Fab,
-  Avatar
+  Avatar,
 } from "@mui/material";
-// import img1 from "public/images/products/s4.jpg";
-// import img2 from "public/images/products/s5.jpg";
-// import img3 from "public/images/products/s7.jpg";
-// import img4 from "public/images/products/s11.jpg";
+// import img1 from "public/images/products/bg-1.png";
+// import img2 from "public/images/products/bg-1.png";
+// import img3 from "public/images/products/bg-1.png";
+// import img4 from "public/images/products/bg-1.png";
 import { Stack } from "@mui/system";
 import { IconBasket } from "@tabler/icons-react";
 import BlankCard from "@/app/(DashboardLayout)/components/shared/BlankCard";
@@ -22,7 +21,7 @@ const ecoCard = [
   {
     title: "Boat Headphone",
     subheader: "September 14, 2023",
-    photo: '/images/products/s4.jpg',
+    photo: "/images/products/bg-1.png",
     salesPrice: 375,
     price: 285,
     rating: 4,
@@ -30,7 +29,7 @@ const ecoCard = [
   {
     title: "MacBook Air Pro",
     subheader: "September 14, 2023",
-    photo: '/images/products/s5.jpg',
+    photo: "/images/products/bg-1.png",
     salesPrice: 650,
     price: 900,
     rating: 5,
@@ -38,7 +37,7 @@ const ecoCard = [
   {
     title: "Red Valvet Dress",
     subheader: "September 14, 2023",
-    photo: '/images/products/s7.jpg',
+    photo: "/images/products/bg-1.png",
     salesPrice: 150,
     price: 200,
     rating: 3,
@@ -46,7 +45,7 @@ const ecoCard = [
   {
     title: "Cute Soft Teddybear",
     subheader: "September 14, 2023",
-    photo: '/images/products/s11.jpg',
+    photo: "/images/products/bg-1.png",
     salesPrice: 285,
     price: 345,
     rating: 2,
@@ -61,21 +60,24 @@ const Blog = () => {
           <BlankCard>
             <Typography component={Link} href="/">
               <Avatar
-                src={product.photo} variant="square"
+                src={product.photo}
+                variant="rounded"
                 sx={{
-                  height: 250,
-                  width: '100%',
+                  height: 150,
+                  width: "100%",
+                  borderRadius: 3,
                 }}
-                
               />
             </Typography>
             <Tooltip title="Add To Cart">
               <Fab
-                size="small"
+                size="medium"
                 color="primary"
-                sx={{ bottom: "75px", right: "15px", position: "absolute" }}
+                sx={{ top: "25px", right: "30px", position: "absolute" }}
               >
-                <IconBasket size="16" />
+                <Typography color="light" ml={1}>
+                  Checked In
+                </Typography>
               </Fab>
             </Tooltip>
             <CardContent sx={{ p: 3, pt: 2 }}>

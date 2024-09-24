@@ -5,14 +5,14 @@ export const plus = Plus_Jakarta_Sans({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
-  fallback: ["Helvetica", "Arial", "sans-serif"],
+  fallback: ["Roboto", "Arial", "sans-serif"],
 });
 
 const baselightTheme = createTheme({
   direction: "ltr",
   palette: {
     primary: {
-      main: "#5D87FF",
+      main: "#7B5AFF",
       light: "#ECF2FF",
       dark: "#4570EA",
     },
