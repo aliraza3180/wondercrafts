@@ -3,112 +3,76 @@ import {
   CardContent,
   Typography,
   Grid,
-  Rating,
-  Tooltip,
-  Fab,
-  Avatar,
+  Button,
+  Box,
 } from "@mui/material";
-// import img1 from "public/images/products/bg-1.png";
-// import img2 from "public/images/products/bg-1.png";
-// import img3 from "public/images/products/bg-1.png";
-// import img4 from "public/images/products/bg-1.png";
-import { Stack } from "@mui/system";
-import { IconBasket } from "@tabler/icons-react";
 import BlankCard from "@/app/(DashboardLayout)/components/shared/BlankCard";
-import Image from "next/image";
 
-const ecoCard = [
-  {
-    title: "Boat Headphone",
-    subheader: "September 14, 2023",
-    photo: "/images/products/bg-1.png",
-    salesPrice: 375,
-    price: 285,
-    rating: 4,
-  },
-  {
-    title: "MacBook Air Pro",
-    subheader: "September 14, 2023",
-    photo: "/images/products/bg-1.png",
-    salesPrice: 650,
-    price: 900,
-    rating: 5,
-  },
-  {
-    title: "Red Valvet Dress",
-    subheader: "September 14, 2023",
-    photo: "/images/products/bg-1.png",
-    salesPrice: 150,
-    price: 200,
-    rating: 3,
-  },
-  {
-    title: "Cute Soft Teddybear",
-    subheader: "September 14, 2023",
-    photo: "/images/products/bg-1.png",
-    salesPrice: 285,
-    price: 345,
-    rating: 2,
-  },
-];
+interface BlogProps {
+  data: any[];
+}
 
-const Blog = () => {
+const Blog = ({ data }: BlogProps) => {
   return (
     <Grid container spacing={3}>
-      {ecoCard.map((product, index) => (
-        <Grid item xs={12} md={4} lg={3} key={index}>
-          <BlankCard>
-            <Typography component={Link} href="/">
-              <Avatar
-                src={product.photo}
-                variant="rounded"
-                sx={{
-                  height: 150,
-                  width: "100%",
-                  borderRadius: 3,
-                }}
-              />
-            </Typography>
-            <Tooltip title="Add To Cart">
-              <Fab
-                size="medium"
-                color="primary"
-                sx={{ top: "25px", right: "30px", position: "absolute" }}
-              >
-                <Typography color="light" ml={1}>
-                  Checked In
-                </Typography>
-              </Fab>
-            </Tooltip>
-            <CardContent sx={{ p: 3, pt: 2 }}>
-              <Typography variant="h6">{product.title}</Typography>
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                mt={1}
-              >
-                <Stack direction="row" alignItems="center">
-                  <Typography variant="h6">${product.price}</Typography>
-                  <Typography
-                    color="textSecondary"
-                    ml={1}
-                    sx={{ textDecoration: "line-through" }}
-                  >
-                    ${product.salesPrice}
-                  </Typography>
-                </Stack>
-                <Rating
-                  name="read-only"
-                  size="small"
-                  value={product.rating}
-                  readOnly
+      {data.map((product, index) => {
+        console.log(product, "product");
+
+        // Create a URL for the uploaded file
+        const imageUrl = product.uploadedFile ? URL.createObjectURL(product.uploadedFile) : "";
+
+        return (
+          <Grid item xs={12} md={4} lg={3} key={index}>
+            <BlankCard>
+              <Typography component={Link} href="/" sx={{ display: "block" }}>
+                <img
+                  src={imageUrl}
+                  alt={product.title}
+                  style={{
+                    height: "160px",
+                    width: "100%",
+                    borderRadius: "18px",
+                  }}
                 />
-              </Stack>
-            </CardContent>
-          </BlankCard>
-        </Grid>
-      ))}
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{
+                  position: 'absolute',
+                  top: "25px",
+                  right: "25px",
+                  borderRadius: "999px",
+                  fontSize: "14px",
+                }}
+              >
+                Checked In
+              </Button>
+              <CardContent sx={{ p: 3, pt: 2 , display: "flex" , flexDirection:"column" , gap:"6px" }}>
+                <Typography variant="h4" sx={{ fontSize: "20px" }}>{product.title}</Typography>
+                <Typography variant="h5" sx={{ fontSize: "16px", color: "#718096", fontWeight: "regular" }}>
+                  {product.bookedDate}
+                </Typography>
+                <Box sx={{ fontSize: "16px", display: "flex", alignItems: "center" }}>
+                  <img
+                    src="/images/products/Avatar.png" // Updated the path
+                    alt="Owner Avatar" // Added alt text for accessibility
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "100%",
+                    }}
+                  />
+                  <Typography variant="h6" sx={{ ml: 2 }}>
+                    Owner: {product.name}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </BlankCard>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 };
