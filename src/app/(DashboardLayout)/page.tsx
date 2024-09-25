@@ -1,36 +1,30 @@
 "use client";
-import ListIcon from '@mui/icons-material/List';
+import ListIcon from "@mui/icons-material/List";
 import { Grid, Box, Typography } from "@mui/material";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Blog from "@/app/(DashboardLayout)/components/dashboard/Blog";
 import { useEffect, useState } from "react";
 import CustomContainer from "@/app/(DashboardLayout)/components/dashboard/SalesOverview";
 import { db } from "@/utils/firebase";
-import { collection, getDocs, addDoc, deleteDoc  } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc } from "firebase/firestore";
 
 const Dashboard = () => {
   const [checkInData, setCheckInData] = useState<any[]>([]);
   const [data, setData] = useState<any>(null); // Updated to type any[]
   const [error, setError] = useState<string | null>(null);
 
-
-
-  async function fetchAllData(){
-    const querySnapshot = await getDocs(collection(db, 'checkin'));
-    const dataFetched = querySnapshot.docs.map(doc => ({
+  async function fetchAllData() {
+    const querySnapshot = await getDocs(collection(db, "checkin"));
+    const dataFetched = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    setCheckInData(dataFetched)
+    setCheckInData(dataFetched);
   }
 
   async function addSingleValue(data: FormData) {
     try {
-      const docRef = await addDoc(collection(db, 'checkin'), {
-        // change this to according to ur data 
-        // name: data.name, 
-        // email: data.email
-      });
+      const docRef = await addDoc(collection(db, "checkin"), {});
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -39,16 +33,13 @@ const Dashboard = () => {
 
   const deleteEntry = async (id: any) => {
     try {
-      await deleteDoc(collection(db, 'checkin', id));  // Get document reference by ID and delete
-      console.log('Document successfully deleted!');
+      await deleteDoc(collection(db, "checkin", id)); // Get document reference by ID and delete
+      console.log("Document successfully deleted!");
       // fetchUsers();  // Refresh the users list after deletion
     } catch (e) {
-      console.error('Error deleting document: ', e);
+      console.error("Error deleting document: ", e);
     }
   };
-
-
-
 
   const handleAddCheckIn = (data: any) => {
     console.log(data, "data");
@@ -70,15 +61,13 @@ const Dashboard = () => {
     //   },
     //   (errorObject) => {
     //     setError("The read failed: " + errorObject.name);
-    //     console.error("Firebase read failed:", errorObject); 
+    //     console.error("Firebase read failed:", errorObject);
     //   }
     // );
 
     // return () => unsubscribe();
 
-    fetchAllData()
-
-
+    fetchAllData();
   }, []);
 
   return (
@@ -90,7 +79,7 @@ const Dashboard = () => {
             {data ? (
               <pre>{JSON.stringify(data, null, 2)}</pre>
             ) : (
-              <Typography>No data available</Typography> 
+              <Typography>No data available</Typography>
             )}
             <CustomContainer onAddCheckIn={handleAddCheckIn} />
           </Grid>
@@ -105,7 +94,10 @@ const Dashboard = () => {
                 fontSize: "30px",
               }}
             >
-              <Typography variant="h2" sx={{ fontSize: "30px", fontWeight: "medium" }}>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "30px", fontWeight: "medium" }}
+              >
                 Added CheckIns
               </Typography>
               <ListIcon sx={{ fontSize: 25 }} /> {/* Simplified styling */}
@@ -113,7 +105,10 @@ const Dashboard = () => {
             {checkInData.length > 0 ? (
               <Blog data={checkInData} />
             ) : (
-              <Typography variant="h5" sx={{ textAlign: "center", marginTop: "100px" }}>
+              <Typography
+                variant="h5"
+                sx={{ textAlign: "center", marginTop: "100px" }}
+              >
                 There is no data here ...!
               </Typography>
             )}

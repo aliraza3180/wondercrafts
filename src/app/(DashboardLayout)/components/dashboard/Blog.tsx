@@ -1,11 +1,5 @@
 import Link from "next/link";
-import {
-  CardContent,
-  Typography,
-  Grid,
-  Button,
-  Box,
-} from "@mui/material";
+import { CardContent, Typography, Grid, Button, Box } from "@mui/material";
 import BlankCard from "@/app/(DashboardLayout)/components/shared/BlankCard";
 
 interface BlogProps {
@@ -19,7 +13,9 @@ const Blog = ({ data }: BlogProps) => {
         console.log(product, "product");
 
         // Create a URL for the uploaded file
-        const imageUrl = product.uploadedFile ? URL.createObjectURL(product.uploadedFile) : "";
+        const imageUrl = product.uploadedFile
+          ? URL.createObjectURL(product.uploadedFile)
+          : "";
 
         return (
           <Grid item xs={12} md={4} lg={3} key={index}>
@@ -40,7 +36,7 @@ const Blog = ({ data }: BlogProps) => {
                 color="primary"
                 size="large"
                 sx={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: "25px",
                   right: "25px",
                   borderRadius: "999px",
@@ -49,12 +45,35 @@ const Blog = ({ data }: BlogProps) => {
               >
                 Checked In
               </Button>
-              <CardContent sx={{ p: 3, pt: 2 , display: "flex" , flexDirection:"column" , gap:"6px" }}>
-                <Typography variant="h4" sx={{ fontSize: "20px" }}>{product.title}</Typography>
-                <Typography variant="h5" sx={{ fontSize: "16px", color: "#718096", fontWeight: "regular" }}>
+              <CardContent
+                sx={{
+                  p: 3,
+                  pt: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                }}
+              >
+                <Typography variant="h4" sx={{ fontSize: "20px" }}>
+                  {product.title}
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: "16px",
+                    color: "#718096",
+                    fontWeight: "regular",
+                  }}
+                >
                   {product.bookedDate}
                 </Typography>
-                <Box sx={{ fontSize: "16px", display: "flex", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    fontSize: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
                   <img
                     src="/images/products/Avatar.png" // Updated the path
                     alt="Owner Avatar" // Added alt text for accessibility
