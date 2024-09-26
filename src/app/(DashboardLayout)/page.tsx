@@ -6,7 +6,7 @@ import Blog from "@/app/(DashboardLayout)/components/dashboard/Blog";
 import { useEffect, useState } from "react";
 import CustomContainer from "@/app/(DashboardLayout)/components/dashboard/SalesOverview";
 import { db } from "@/utils/firebase";
-import { collection, getDocs, addDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc , deleteDoc } from "firebase/firestore";
 
 const Dashboard = () => {
   const [checkInData, setCheckInData] = useState<any[]>([]);
@@ -15,12 +15,17 @@ const Dashboard = () => {
 
   async function fetchAllData() {
     const querySnapshot = await getDocs(collection(db, "checkin"));
-    const dataFetched = querySnapshot.docs.map((doc) => ({
+    console.log(querySnapshot,"snapshot");
+    
+    const dataFetched = querySnapshot.docs.map((doc) => ({      
       id: doc.id,
       ...doc.data(),
     }));
     setCheckInData(dataFetched);
+    console.log(dataFetched,"checkedinData");
   }
+
+  
 
   async function addSingleValue(data: FormData) {
     try {
@@ -30,16 +35,17 @@ const Dashboard = () => {
       console.error("Error adding document: ", e);
     }
   }
-
-  const deleteEntry = async (id: any) => {
+  const deleteEntry = async (id: string) => {
     try {
-      await deleteDoc(collection(db, "checkin", id)); // Get document reference by ID and delete
+      const docRef = doc(db, "checkin", id); // Correctly reference the document by its ID
+      await deleteDoc(docRef);
       console.log("Document successfully deleted!");
-      // fetchUsers();  // Refresh the users list after deletion
+      fetchAllData(); // Refresh the data after deletion
     } catch (e) {
       console.error("Error deleting document: ", e);
     }
   };
+  
 
   const handleAddCheckIn = (data: any) => {
     console.log(data, "data");
@@ -100,7 +106,7 @@ const Dashboard = () => {
               >
                 Added CheckIns
               </Typography>
-              <ListIcon sx={{ fontSize: 25 }} /> {/* Simplified styling */}
+              <ListIcon sx={{ fontSize: 25 }} /> 
             </Box>
             {checkInData.length > 0 ? (
               <Blog data={checkInData} />

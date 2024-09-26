@@ -83,12 +83,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
     try {
       // Send data to Firestore
       const docRef = await addDoc(collection(db, "checkin"), {
-        title: formData.title,
-        name: formData.name,
-        bookingID: formData.bookingID,
-        rooms: formData.rooms,
-        guests: formData.guests,
-        bookedDate: formData.bookedDate,
+       formData
       });
       console.log("Document written with ID: ", docRef.id);
       onAddCheckIn(formData); 

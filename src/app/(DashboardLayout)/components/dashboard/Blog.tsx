@@ -7,14 +7,13 @@ interface BlogProps {
 }
 
 const Blog = ({ data }: BlogProps) => {
+  console.log(data,'image in data');
   return (
     <Grid container spacing={3}>
       {data.map((product, index) => {
-        console.log(product, "product");
-
         // Create a URL for the uploaded file
         const imageUrl = product.uploadedFile
-          ? URL.createObjectURL(product.uploadedFile)
+          ? (product.uploadedFile)
           : "";
 
         return (
