@@ -35,7 +35,7 @@ const Header = ({ toggleMobileSidebar }: ItemType) => {
   }));
 
   return (
-    <AppBarStyled position="sticky" color="default">
+    <AppBarStyled position="sticky" color="default" sx={{px:"40px"}}>
       <ToolbarStyled>
         <img src="/logo.svg" alt="Logo" style={{ width: '25px', marginRight: '16px' }} />
         

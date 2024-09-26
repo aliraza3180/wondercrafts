@@ -78,14 +78,14 @@ const Dashboard = () => {
 
   return (
     <PageContainer title="HomePage" description="This is the HomePage">
-      <Box>
-        <Grid container spacing={3}>
+      <Box sx={{px:"20px"}}>
+        <Grid container spacing={3} >
           <Grid item xs={12} lg={12}>
             {error && <Typography color="error">Error: {error}</Typography>}
             {data ? (
               <pre>{JSON.stringify(data, null, 2)}</pre>
             ) : (
-              <Typography>No data available</Typography>
+              ""
             )}
             <CustomContainer onAddCheckIn={handleAddCheckIn} />
           </Grid>

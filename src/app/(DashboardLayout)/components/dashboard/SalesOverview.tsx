@@ -9,8 +9,10 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import React, { useState } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
-import { db } from "@/utils/firebase"; // Import the Firestore database
+import { db } from "@/utils/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { format } from "date-fns";
 
 const style = {
   position: "absolute" as "absolute",
@@ -46,7 +48,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
     bookingID: "12345678",
     rooms: 4,
     guests: 4,
-    bookedDate: "12th Nov, 2022",
+    bookedDate: format(new Date(), "yyyy-MM-dd"),
   });
 
   const handleOpenMainModal = (): void => {
@@ -66,9 +68,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
     setOpenNestedModal(false);
   };
 
-  const handleFileUpload = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const files = event.target.files;
     if (files && files.length > 0) {
       setFormData((prevData) => ({
@@ -79,11 +79,24 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
     }
   };
 
+  const uploadFile = async (file: File) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `uploads/${file.name}`);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  };
+
   const handleOk = async () => {
     try {
-      // Send data to Firestore
+      let fileUrl = "";
+      if (formData.uploadedFile) {
+        fileUrl = await uploadFile(formData.uploadedFile);
+      }
+
       const docRef = await addDoc(collection(db, "checkin"), {
-       formData
+        ...formData,
+        uploadedFile: fileUrl,
       });
       console.log("Document written with ID: ", docRef.id);
       onAddCheckIn(formData); 
@@ -97,7 +110,17 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: name === "rooms" || name === "guests" ? Number(value) : value, 
+      [name]: name === "rooms" || name === "guests" ? Number(value) : value,
+    }));
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const date = new Date(value);
+    const formattedDate = format(date, "yyyy-MM-dd");
+    setFormData((prevData) => ({
+      ...prevData,
+      bookedDate: formattedDate,
     }));
   };
 
@@ -311,7 +334,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
             gap: 2,
           }}
         >
-          {/* First Box: Title and Icon */}
           <Box
             sx={{
               display: "flex",
@@ -330,7 +352,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
             />
           </Box>
 
-          {/* Second Box: Fields and Image */}
           <Box
             sx={{
               display: "flex",
@@ -339,7 +360,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
               margin: "40px 0px",
             }}
           >
-            {/* Left Side: Input Fields with Labels */}
             <Box
               sx={{
                 display: "flex",
@@ -348,7 +368,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 gap: "30px",
               }}
             >
-              {/* Name Field */}
               <Box
                 sx={{
                   display: "flex",
@@ -376,7 +395,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                     maxWidth: "133px",
                     maxHeight: "32px",
                     "& .MuiInputBase-input": {
-                      padding: "4px", // Remove padding
+                      padding: "4px",
                     },
                   }}
                   value={formData.name}
@@ -384,7 +403,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 />
               </Box>
 
-              {/* Booking ID Field */}
               <Box
                 sx={{
                   display: "flex",
@@ -411,7 +429,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                     maxWidth: "133px",
                     maxHeight: "32px",
                     "& .MuiInputBase-input": {
-                      padding: "4px", // Remove padding
+                      padding: "4px",
                     },
                   }}
                   value={formData.bookingID}
@@ -419,7 +437,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 />
               </Box>
 
-              {/* Rooms Field */}
               <Box
                 sx={{
                   display: "flex",
@@ -447,7 +464,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                     maxWidth: "38px",
                     maxHeight: "32px",
                     "& .MuiInputBase-input": {
-                      padding: "4px 0 4px 14px", // Remove padding
+                      padding: "4px 0 4px 14px",
                     },
                   }}
                   value={formData.rooms}
@@ -455,7 +472,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 />
               </Box>
 
-              {/* Number of Guests Field */}
               <Box
                 sx={{
                   display: "flex",
@@ -483,7 +499,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                     maxWidth: "38px",
                     maxHeight: "32px",
                     "& .MuiInputBase-input": {
-                      padding: "4px 0 4px 14px", // Remove padding
+                      padding: "4px 0 4px 14px",
                     },
                   }}
                   value={formData.guests}
@@ -491,7 +507,6 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 />
               </Box>
 
-              {/* Booked Date Field */}
               <Box
                 sx={{
                   display: "flex",
@@ -515,10 +530,14 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   fullWidth
                   name="bookedDate"
                   value={formData.bookedDate}
-                  onChange={handleChange}
+                  onChange={handleDateChange}
                   sx={{
                     maxWidth: "133px",
                     "& .MuiInputBase-input": { padding: "4px" },
+                  }}
+                  type="date"
+                  InputLabelProps={{
+                    shrink: true,
                   }}
                 />
               </Box>
