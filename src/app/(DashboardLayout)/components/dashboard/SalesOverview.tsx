@@ -33,39 +33,50 @@ interface CustomContainerProps {
 const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
   const [openMainModal, setOpenMainModal] = useState<boolean>(false);
   const [openNestedModal, setOpenNestedModal] = useState<boolean>(false);
-  const [formData, setFormData] = useState<{
-    title: string;
-    name: string;
-    uploadedFile: File | null;
-    bookingID: string;
-    rooms: number;
-    guests: number;
-    bookedDate: string;
-  }>({
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const defaultFormData = {
     title: "",
     name: "",
-    uploadedFile: null,
+    uploadedFile: null as File | null,
     bookingID: "12345678",
     rooms: 4,
     guests: 4,
     bookedDate: format(new Date(), "yyyy-MM-dd"),
-  });
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
 
   const handleOpenMainModal = (): void => {
     setOpenMainModal(true);
+    setFormData(defaultFormData);
+    setFormErrors({});
   };
 
   const handleCloseMainModal = (): void => {
     setOpenMainModal(false);
+    setFormData(defaultFormData);
+    setFormErrors({});
   };
 
   const handleOpenNestedModal = (): void => {
-    setOpenNestedModal(true);
-    setOpenMainModal(false);
+    const errors: { [key: string]: string } = {};
+    if (!formData.title.trim()) errors.title = "Title is required";
+    if (!formData.uploadedFile) errors.uploadedFile = "Image is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+    } else {
+      setOpenNestedModal(true);
+      setOpenMainModal(false);
+      setFormErrors({});
+    }
   };
 
   const handleCloseNestedModal = (): void => {
     setOpenNestedModal(false);
+    setFormData(defaultFormData);
+    setFormErrors({});
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -75,7 +86,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
         ...prevData,
         uploadedFile: files[0],
       }));
-      console.log("Uploaded file:", files[0]);
+      setFormErrors((prevErrors) => ({ ...prevErrors, uploadedFile: "" }));
     }
   };
 
@@ -88,6 +99,18 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
   };
 
   const handleOk = async () => {
+    const errors: { [key: string]: string } = {};
+    Object.keys(formData).forEach((key) => {
+      if (!formData[key as keyof typeof formData]) {
+        errors[key] = `${key} is required`;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     try {
       let fileUrl = "";
       if (formData.uploadedFile) {
@@ -99,8 +122,8 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
         uploadedFile: fileUrl,
       });
       console.log("Document written with ID: ", docRef.id);
-      onAddCheckIn(formData); 
-      handleCloseNestedModal(); 
+      onAddCheckIn(formData);
+      handleCloseNestedModal();
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -112,6 +135,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
       ...prevData,
       [name]: name === "rooms" || name === "guests" ? Number(value) : value,
     }));
+    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,6 +146,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
       ...prevData,
       bookedDate: formattedDate,
     }));
+    setFormErrors((prevErrors) => ({ ...prevErrors, bookedDate: "" }));
   };
 
   return (
@@ -215,6 +240,8 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
             placeholder="Enter title"
             value={formData.title}
             onChange={handleChange}
+            error={!!formErrors.title}
+            helperText={formErrors.title}
             sx={{
               margin: "16px 24px 0px 24px",
               maxWidth: "525px",
@@ -270,17 +297,15 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   onChange={handleFileUpload}
                 />
                 <label htmlFor="file-upload">
-                  <IconButton
-                    component="span"
-                    color="primary"
-                    aria-label="upload picture"
-                  >
-                    <CloudUploadIcon fontSize="large" />
-                  </IconButton>
-                  <Typography variant="body2" color="textSecondary">
+                <img
+    src="/images/logos/upload.png" 
+    alt="Upload"
+    style={{ width: '35.11px', height: '35.11px' , marginBottom:"12px" }} 
+  />
+                  <Typography variant="h5" color="black">
                     Click or drag file to this area to upload
                   </Typography>
-                  <Typography variant="caption" display="block">
+                  <Typography variant="h6" color="#B4B4B4" fontStyle="regular" marginTop="4px" maxWidth="395px" fontSize="14px" display="block">
                     Support for a single or bulk upload. Strictly prohibit from
                     uploading company data or other banned files.
                   </Typography>
@@ -288,6 +313,11 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
               </>
             )}
           </Box>
+          {formErrors.uploadedFile && (
+            <Typography color="error" sx={{ mt: 1, textAlign: "center" }}>
+              {formErrors.uploadedFile}
+            </Typography>
+          )}
 
           <Box
             sx={{
@@ -400,6 +430,8 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   }}
                   value={formData.name}
                   onChange={handleChange}
+                  error={!!formErrors.name}
+                  helperText={formErrors.name}
                 />
               </Box>
 
@@ -434,6 +466,8 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   }}
                   value={formData.bookingID}
                   onChange={handleChange}
+                  error={!!formErrors.bookingID}
+                  helperText={formErrors.bookingID}
                 />
               </Box>
 
@@ -457,7 +491,7 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                 </Typography>
                 <TextField
                   variant="outlined"
-                  type="text"
+                  type="number"
                   fullWidth
                   name="rooms"
                   sx={{
@@ -469,6 +503,8 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   }}
                   value={formData.rooms}
                   onChange={handleChange}
+                  error={!!formErrors.rooms}
+                  helperText={formErrors.rooms}
                 />
               </Box>
 
@@ -478,128 +514,131 @@ const CustomContainer: React.FC<CustomContainerProps> = ({ onAddCheckIn }) => {
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    mr: 2,
-                    fontSize: "16px",
-                    fontWeight: "medium",
-                    color: "black",
-                  }}
-                >
-                  Number of Guests
-                </Typography>
-                <TextField
-                  variant="outlined"
-                  type="text"
-                  fullWidth
-                  name="guests"
-                  sx={{
-                    maxWidth: "38px",
-                    maxHeight: "32px",
-                    "& .MuiInputBase-input": {
-                      padding: "4px 0 4px 14px",
-                    },
-                  }}
-                  value={formData.guests}
-                  onChange={handleChange}
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    mr: 2,
-                    fontSize: "16px",
-                    fontWeight: "medium",
-                    color: "black",
-                  }}
-                >
-                  Booked Date
-                </Typography>
-                <TextField
-                  variant="outlined"
-                  fullWidth
-                  name="bookedDate"
-                  value={formData.bookedDate}
-                  onChange={handleDateChange}
-                  sx={{
-                    maxWidth: "133px",
-                    "& .MuiInputBase-input": { padding: "4px" },
-                  }}
-                  type="date"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Box>
-            </Box>
-
-            {/* Right Side: Image Preview */}
-            <Box
+              ><Typography
+              variant="body1"
               sx={{
-                display: "flex",
-                width: "50%",
-                justifyContent: "center",
-                alignItems: "center",
+                mr: 2,
+                fontSize: "16px",
+                fontWeight: "medium",
+                color: "black",
               }}
             >
-              {formData.uploadedFile ? (
-                <img
-                  src={URL.createObjectURL(formData.uploadedFile)}
-                  alt="Uploaded Preview"
-                  style={{
-                    maxHeight: "134px",
-                    maxWidth: "256px",
-                    borderRadius: "10px",
-                  }}
-                />
-              ) : (
-                <Typography variant="body2" color="textSecondary">
-                  No Image Uploaded
-                </Typography>
-              )}
-            </Box>
+              Number of Guests
+            </Typography>
+            <TextField
+              variant="outlined"
+              type="number"
+              fullWidth
+              name="guests"
+              sx={{
+                maxWidth: "38px",
+                maxHeight: "32px",
+                "& .MuiInputBase-input": {
+                  padding: "4px 0 4px 14px",
+                },
+              }}
+              value={formData.guests}
+              onChange={handleChange}
+              error={!!formErrors.guests}
+              helperText={formErrors.guests}
+            />
           </Box>
 
-          {/* Button Section */}
           <Box
             sx={{
-              mt: 3,
-              px: 3,
               display: "flex",
-              justifyContent: "end",
-              gap: 2,
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <Button
+            <Typography
+              variant="body1"
+              sx={{
+                mr: 2,
+                fontSize: "16px",
+                fontWeight: "medium",
+                color: "black",
+              }}
+            >
+              Booked Date
+            </Typography>
+            <TextField
               variant="outlined"
-              onClick={handleCloseNestedModal}
-              sx={{ borderRadius: "999px" }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleOk}
-              sx={{ borderRadius: "999px" }}
-            >
-              OK{" "}
-            </Button>
+              fullWidth
+              name="bookedDate"
+              value={formData.bookedDate}
+              onChange={handleDateChange}
+              sx={{
+                maxWidth: "133px",
+                "& .MuiInputBase-input": { padding: "4px" },
+              }}
+              type="date"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              error={!!formErrors.bookedDate}
+              helperText={formErrors.bookedDate}
+            />
           </Box>
         </Box>
-      </Modal>
+
+        {/* Right Side: Image Preview */}
+        <Box
+          sx={{
+            display: "flex",
+            width: "50%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {formData.uploadedFile ? (
+            <img
+              src={URL.createObjectURL(formData.uploadedFile)}
+              alt="Uploaded Preview"
+              style={{
+                maxHeight: "134px",
+                maxWidth: "256px",
+                borderRadius: "10px",
+              }}
+            />
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No Image Uploaded
+            </Typography>
+          )}
+        </Box>
+      </Box>
+
+      {/* Button Section */}
+      <Box
+        sx={{
+          mt: 3,
+          px: 3,
+          display: "flex",
+          justifyContent: "end",
+          gap: 2,
+        }}
+      >
+        <Button
+          variant="outlined"
+          onClick={handleCloseNestedModal}
+          sx={{ borderRadius: "999px" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOk}
+          sx={{ borderRadius: "999px" }}
+        >
+          OK
+        </Button>
+      </Box>
     </Box>
-  );
+  </Modal>
+</Box>
+);
 };
 
 export default CustomContainer;
